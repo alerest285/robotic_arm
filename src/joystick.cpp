@@ -1,4 +1,5 @@
 #include "joystick.h"
+#include "math.h"
 
 namespace robotic_arm {
     
