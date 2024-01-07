@@ -25,7 +25,7 @@ class CartesianJoystick {
      * @param vertical_input_pin Pin number for the horizontal input signal. 
      * @param max_displacement_per_loop Maximum displacement signaled (in centimeters).
      */
-    Joystick(int horizontal_input_pin, int vertical_input_pin, double max_displacement_per_loop);
+    CartesianJoystick(int horizontal_input_pin, int vertical_input_pin, double max_displacement_per_loop);
     
     PlaneCartesianCoordinates getDeltaCartesianCoordinates();
 };

@@ -10,7 +10,7 @@ void logging(LoggingEnum level, String message) {
 }
 
 RobotWithHorizontalHand robot(logging);
-Joystick joystick(HORZ_PIN, VERT_PIN, /*max_displacement_per_loop=*/0.1);
+CartesianJoystick joystick(HORZ_PIN, VERT_PIN, /*max_displacement_per_loop=*/0.1);
 
 int loop_counter = 0;
 const int SECONDS_PER_LOOP = 5000;
