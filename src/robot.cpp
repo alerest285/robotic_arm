@@ -9,6 +9,10 @@ RobotWithHorizontalHand::RobotWithHorizontalHand(LoggingCallback logging_callbac
   _hand = new ServoArm("hand", /*length=*/ 6.0, /*pin=*/11, /*map_range=*/{90, 270, 10, 170}, _logging);
   _forearm_length = 15.0;
 };
+
+String RobotWithHorizontalHand::AngularCoordinates::toString(){
+  return "shoulder_angle: " + String(shoulder_angle) + ", elbow_angle: " + String(elbow_angle);
+}  
   
 PlaneCartesianCoordinates RobotWithHorizontalHand::_calculateCartesianCoordinates(AngularCoordinates angular_coordinates) {
   double A = _shoulder->length();
