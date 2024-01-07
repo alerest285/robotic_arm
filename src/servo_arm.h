@@ -1,6 +1,8 @@
 #ifndef ROBOTIC_ARM_SERVO_ARM_H
 #define ROBOTIC_ARM_SERVO_ARM_H
 
+#include "Servo.h"
+
 namespace robotic_arm {
 
 class ServoArm {
