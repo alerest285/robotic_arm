@@ -2,7 +2,7 @@
 
 namespace robotic_arm {
     
-CartesianJoystick::Joystick(int horizontal_input_pin, int vertical_input_pin, double max_displacement_per_loop): 
+CartesianJoystick::CartesianJoystick(int horizontal_input_pin, int vertical_input_pin, double max_displacement_per_loop): 
   _horizontal_input_pin(horizontal_input_pin), _vertical_input_pin(vertical_input_pin), 
   _max_displacement_per_loop(max_displacement_per_loop){
 
