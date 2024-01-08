@@ -1,3 +1,5 @@
+#include <Arduino.h>
+#include <HardwareSerial.h>
 #include "joystick.h"
 #include "logging.h"
 #include "robot.h"
@@ -5,12 +7,12 @@
 #define HORZ_PIN A0
 #define VERT_PIN A1
 
-void logging(LoggingEnum level, String message) {
-  Serial.println(LoggingEnumToString(level) + ": " + message);
+void logging(robotic_arm::LoggingEnum level, String message) {
+  Serial.println(robotic_arm::LoggingEnumToString(level) + ": " + message);
 }
 
-RobotWithHorizontalHand robot(logging);
-CartesianJoystick joystick(HORZ_PIN, VERT_PIN, /*max_displacement_per_loop=*/0.1);
+robotic_arm::RobotWithHorizontalHand robot(logging);
+robotic_arm::CartesianJoystick joystick(HORZ_PIN, VERT_PIN, /*max_displacement_per_loop=*/0.1);
 
 int loop_counter = 0;
 const int SECONDS_PER_LOOP = 5000;
@@ -22,7 +24,7 @@ void setup() {
 void loop() {
 
   logging(
-    LoggingEnum::INFO,
+    robotic_arm::LoggingEnum::INFO,
     "\nLoop No " + String(loop_counter) + "."
   );
   switch (loop_counter) {
@@ -31,27 +33,27 @@ void loop() {
       robot.setMethodToDerivative();
       robot.moveArmsTo(90, 180);
       logging(
-        LoggingEnum::INFO, 
+        robotic_arm::LoggingEnum::INFO, 
         "Cartesian coordinates: " + robot.currentCartesianCoordinates().toString()
       );
       logging(
-        LoggingEnum::INFO, 
+        robotic_arm::LoggingEnum::INFO, 
         "Angular coordinates: " + robot.currentAngularCoordinates().toString()
       );
       break;
     default: 
       // DEFAULT EXECUTION LOOP
-      PlaneCartesianCoordinates delta_coordinates = joystick.getDeltaCartesianCoordinates();
+      robotic_arm::PlaneCartesianCoordinates delta_coordinates = joystick.getDeltaCartesianCoordinates();
       logging(
-        LoggingEnum::DEBUG, 
+        robotic_arm::LoggingEnum::DEBUG, 
         "delta x: " + String(delta_coordinates.x) + ", delta y: " + String(delta_coordinates.y));
       robot.moveBy(delta_coordinates.x, delta_coordinates.y);
       logging(
-        LoggingEnum::INFO, 
+        robotic_arm::LoggingEnum::INFO, 
         "Cartesian coordinates: " + robot.currentCartesianCoordinates().toString()
       );
       logging(
-        LoggingEnum::INFO, 
+        robotic_arm::LoggingEnum::INFO, 
         "Angular coordinates: " + robot.currentAngularCoordinates().toString()
       );
       break;
