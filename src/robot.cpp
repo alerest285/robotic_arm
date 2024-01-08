@@ -6,11 +6,11 @@
 
 namespace robotic_arm {
 
-Robot::Robot(LoggingCallback logging_callback): _logging(logging_callback), _method(MethodEnum::EXACT){
+Robot::Robot(LoggingCallback logging_callback): _logging(logging_callback), _method(MethodEnum::EXACT), 
+  _forearm_length(15.0){
   _shoulder = new ServoArm("shoulder", /*length=*/ 18.7, /*pin=*/9, /*map_range=*/{0, 180, 141, 5}, _logging);
   _elbow = new ServoArm("elbow", /*length=*/ 6.7, /*pin=*/10, /*map_range=*/{90, 270, 0, 180}, _logging);      
   _hand = new ServoArm("hand", /*length=*/ 6.0, /*pin=*/11, /*map_range=*/{90, 270, 10, 170}, _logging);
-  _forearm_length = 15.0;
 };
 
 String Robot::AngularCoordinates::toString(){
