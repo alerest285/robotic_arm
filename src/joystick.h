@@ -1,6 +1,8 @@
 #ifndef ROBOTIC_ARM_JOYSTICK_H
 #define ROBOTIC_ARM_JOYSTICK_H
 
+#include "math.h"
+
 namespace robotic_arm {
   
 constexpr int MIN_JOYSTICK_INPUT = 0;
