@@ -83,11 +83,11 @@ double Robot::_calculateDeterminant(AngularDerivatives angular_derivatives){
      - angular_derivatives.x_by_elbow_angle * angular_derivatives.y_by_shoulder_angle;
 }
 
-void Robot::_moveByWithExactMethod(double delta_x, double delta_y) {
+void Robot::_moveByWithExactMethod(PlaneCartesianCoordinates delta_cartesian_coordinates) {
   PlaneCartesianCoordinates current_cartesian_coordinates = currentCartesianCoordinates();
   PlaneCartesianCoordinates projected_cartesian_coordinates = {
-    x: current_cartesian_coordinates.x + delta_x, 
-    y: current_cartesian_coordinates.y + delta_y};
+    x: current_cartesian_coordinates.x + delta_cartesian_coordinates.x, 
+    y: current_cartesian_coordinates.y + delta_cartesian_coordinates.y};
   AngularCoordinates projected_angular_coordinates =  
     _calculateAngularCoordinates(projected_cartesian_coordinates, _hand_reference_angle);
   if (isnan(projected_angular_coordinates.shoulder_angle) 
@@ -105,10 +105,11 @@ void Robot::_moveByWithExactMethod(double delta_x, double delta_y) {
   _updateHandReferenceAngle();
 }
 
-void Robot::_moveByWithDerivativeMethod(double delta_x, double delta_y) {
+void Robot::_moveByWithDerivativeMethod(PlaneCartesianCoordinates delta_cartesian_coordinates) {
   PlaneCartesianCoordinates current_cartesian_coordinates = currentCartesianCoordinates();
   PlaneCartesianCoordinates expected_cartesian_coordinates = {
-    x: current_cartesian_coordinates.x + delta_x, y: current_cartesian_coordinates.y + delta_y};
+    x: current_cartesian_coordinates.x + delta_cartesian_coordinates.x, 
+    y: current_cartesian_coordinates.y + delta_cartesian_coordinates.y};
   AngularDerivatives angular_derivatives = _calculateAngularDerivatives(
     {shoulder_angle: _shoulder->currentAngle(), elbow_angle: _elbow->currentAngle()});    
   double determinant = _calculateDeterminant(angular_derivatives);
@@ -119,8 +120,12 @@ void Robot::_moveByWithDerivativeMethod(double delta_x, double delta_y) {
     return;
   }
 
-  double delta_shoulder_angle = (delta_x * angular_derivatives.y_by_elbow_angle - delta_y * angular_derivatives.x_by_elbow_angle) / determinant;
-  double delta_elbow_angle = (delta_y * angular_derivatives.x_by_shoulder_angle - delta_x * angular_derivatives.y_by_shoulder_angle) / determinant;
+  double delta_shoulder_angle = (
+    delta_cartesian_coordinates.x * angular_derivatives.y_by_elbow_angle 
+    - delta_cartesian_coordinates.y * angular_derivatives.x_by_elbow_angle) / determinant;
+  double delta_elbow_angle = (
+    delta_cartesian_coordinates.y * angular_derivatives.x_by_shoulder_angle 
+    - delta_cartesian_coordinates.x * angular_derivatives.y_by_shoulder_angle) / determinant;
   
   Robot::AngularCoordinates projected_angular_coordinates =  {
     shoulder_angle: _shoulder->currentAngle() + delta_shoulder_angle, 
@@ -175,10 +180,10 @@ void Robot::moveArmsTo(double shoulder_angle, double elbow_angle, double hand_re
 
 void Robot::moveBy(PlaneCartesianCoordinates delta_cartesian_coordinates) {
   if (_method == MethodEnum::EXACT) {
-   _moveByWithExactMethod(delta_cartesian_coordinates.x, delta_cartesian_coordinates.y);
+   _moveByWithExactMethod(delta_cartesian_coordinates);
   }
   else if (_method == MethodEnum::DERIVATIVE) {
-   _moveByWithDerivativeMethod(delta_cartesian_coordinates.x, delta_cartesian_coordinates.y);
+   _moveByWithDerivativeMethod(delta_cartesian_coordinates);
   }
 }    
   
