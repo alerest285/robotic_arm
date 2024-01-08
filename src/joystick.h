@@ -2,6 +2,9 @@
 #define ROBOTIC_ARM_JOYSTICK_H
 
 namespace robotic_arm {
+  
+constexpr int MIN_JOYSTICK_INPUT = 0;
+constexpr int MAX_JOYSTICK_INPUT = 1023;
 
 class CartesianJoystick {
 
@@ -10,8 +13,6 @@ class CartesianJoystick {
   double _max_displacement_per_loop;
 
   const int _min_milis = 100;
-  const int _min_joystick_input = 0;
-  const int _max_joyistick_input = 1023;
 
   public: 
 
@@ -29,7 +30,3 @@ class CartesianJoystick {
     
     PlaneCartesianCoordinates getDeltaCartesianCoordinates();
 };
-
-} // namespace robotic_arm
-
-#endif // ROBOTIC_ARM_LOGGING_H
