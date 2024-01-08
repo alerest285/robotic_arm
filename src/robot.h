@@ -16,9 +16,6 @@ class Robot {
   ServoArm *_elbow;
   ServoArm *_hand;
 
-  /* Keep state of the angle of the hand respect to the horizontal axis.*/
-  double _hand_reference_angle;
-
   const double _forearm_length;
 
   const double _differential_stability_threshold = 1e-3;
@@ -58,7 +55,7 @@ class Robot {
 
   double _calculateHandAngle(AngularCoordinates angular_coordinates);
 
-  void _updateHandReferenceAngle();
+  double _getCurrentHandReferenceAngle();
 
   public:
 
