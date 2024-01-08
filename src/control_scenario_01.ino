@@ -47,7 +47,7 @@ void loop() {
       logging(
         robotic_arm::LoggingEnum::DEBUG, 
         "delta x: " + String(delta_coordinates.x) + ", delta y: " + String(delta_coordinates.y));
-      robot.moveBy(delta_coordinates);
+      robot.moveBy(delta_coordinates, 0);
       logging(
         robotic_arm::LoggingEnum::INFO, 
         "Cartesian coordinates: " + robot.currentCartesianCoordinates().toString()

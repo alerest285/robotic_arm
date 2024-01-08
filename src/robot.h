@@ -49,9 +49,13 @@ class Robot {
 
   double _calculateDeterminant(AngularDerivatives angular_derivatives);
 
-  void _moveByWithExactMethod(PlaneCartesianCoordinates delta_cartesian_coordinates);
+  void _moveByWithExactMethod(
+    PlaneCartesianCoordinates delta_cartesian_coordinates,
+    double delta_hand_reference_angle);
 
-  void _moveByWithDerivativeMethod(PlaneCartesianCoordinates delta_cartesian_coordinates);
+  void _moveByWithDerivativeMethod(
+    PlaneCartesianCoordinates delta_cartesian_coordinates,
+    double delta_hand_reference_angle);
 
   double _calculateHandAngle(AngularCoordinates angular_coordinates);
 
@@ -67,7 +71,7 @@ class Robot {
     
     void moveArmsTo(AngularCoordinates angular_coordinates);
     
-    void moveBy(PlaneCartesianCoordinates delta_cartesian_coordinates);
+    void moveBy(PlaneCartesianCoordinates delta_cartesian_coordinates, double delta_hand_reference_angle);
     
     void setMethodToExact();
     
