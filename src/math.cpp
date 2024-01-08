@@ -9,7 +9,7 @@ double cosDegrees(double x){
 }
 
 double cosDegreesDerivative(double x){
-   return - (pi / 180) * sin(x * PI / 180); 
+   return - (PI / 180) * sin(x * PI / 180); 
 }
 
 double sinDegrees(double x){
