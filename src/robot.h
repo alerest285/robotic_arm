@@ -16,7 +16,7 @@ class Robot {
   ServoArm *_elbow;
   ServoArm *_hand;
 
-  double _forearm_length;
+  const double _forearm_length;
 
   const double _differential_stability_threshold = 1e-3;
 
