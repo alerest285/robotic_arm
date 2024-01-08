@@ -43,7 +43,7 @@ class ServoArm {
     double currentAngle();
 
     double length();
-}
+    
 };
 
 } // namespace robotic_arm
