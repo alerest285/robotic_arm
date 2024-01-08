@@ -8,7 +8,7 @@
 
 namespace robotic_arm {
 
-class RobotWithHorizontalHand {
+class Robot {
 
   LoggingCallback _logging;
 
@@ -56,7 +56,7 @@ class RobotWithHorizontalHand {
 
   public:
 
-    RobotWithHorizontalHand(LoggingCallback logging_callback);
+    Robot(LoggingCallback logging_callback);
     
     PlaneCartesianCoordinates currentCartesianCoordinates();
     

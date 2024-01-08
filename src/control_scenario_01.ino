@@ -11,7 +11,7 @@ void logging(robotic_arm::LoggingEnum level, String message) {
   Serial.println(robotic_arm::LoggingEnumToString(level) + ": " + message);
 }
 
-robotic_arm::RobotWithHorizontalHand robot(logging);
+robotic_arm::Robot robot(logging);
 robotic_arm::CartesianJoystick joystick(HORZ_PIN, VERT_PIN, /*max_displacement_per_loop=*/0.1);
 
 int loop_counter = 0;

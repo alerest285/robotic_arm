@@ -6,18 +6,18 @@
 
 namespace robotic_arm {
 
-RobotWithHorizontalHand::RobotWithHorizontalHand(LoggingCallback logging_callback): _logging(logging_callback), _method(MethodEnum::EXACT){
+Robot::Robot(LoggingCallback logging_callback): _logging(logging_callback), _method(MethodEnum::EXACT){
   _shoulder = new ServoArm("shoulder", /*length=*/ 18.7, /*pin=*/9, /*map_range=*/{0, 180, 141, 5}, _logging);
   _elbow = new ServoArm("elbow", /*length=*/ 6.7, /*pin=*/10, /*map_range=*/{90, 270, 0, 180}, _logging);      
   _hand = new ServoArm("hand", /*length=*/ 6.0, /*pin=*/11, /*map_range=*/{90, 270, 10, 170}, _logging);
   _forearm_length = 15.0;
 };
 
-String RobotWithHorizontalHand::AngularCoordinates::toString(){
+String Robot::AngularCoordinates::toString(){
   return "shoulder_angle: " + String(shoulder_angle) + ", elbow_angle: " + String(elbow_angle);
 }  
   
-PlaneCartesianCoordinates RobotWithHorizontalHand::_calculateCartesianCoordinates(AngularCoordinates angular_coordinates) {
+PlaneCartesianCoordinates Robot::_calculateCartesianCoordinates(AngularCoordinates angular_coordinates) {
   double A = _shoulder->length();
   double B = _elbow->length();
   double C = _forearm_length;
@@ -32,8 +32,8 @@ PlaneCartesianCoordinates RobotWithHorizontalHand::_calculateCartesianCoordinate
   return {x: x, y: y};
 }  
 
-RobotWithHorizontalHand::AngularDerivatives RobotWithHorizontalHand::_calculateAngularDerivatives(
-  RobotWithHorizontalHand::AngularCoordinates angular_coordinates) {
+Robot::AngularDerivatives Robot::_calculateAngularDerivatives(
+  Robot::AngularCoordinates angular_coordinates) {
   double A = _shoulder->length();
   double B = _elbow->length();
   double C = _forearm_length;
@@ -56,7 +56,7 @@ RobotWithHorizontalHand::AngularDerivatives RobotWithHorizontalHand::_calculateA
   };
 }
 
-RobotWithHorizontalHand::AngularCoordinates RobotWithHorizontalHand::_calculateAngularCoordinates(
+Robot::AngularCoordinates Robot::_calculateAngularCoordinates(
   PlaneCartesianCoordinates cartesian_coordinates) {
   double x = cartesian_coordinates.x;
   double y = cartesian_coordinates.y;
@@ -71,12 +71,12 @@ RobotWithHorizontalHand::AngularCoordinates RobotWithHorizontalHand::_calculateA
   return {shoulder_angle: shoulder_angle, elbow_angle: elbow_angle};
 }
 
-double RobotWithHorizontalHand::_calculateDeterminant(AngularDerivatives angular_derivatives){
+double Robot::_calculateDeterminant(AngularDerivatives angular_derivatives){
   return angular_derivatives.x_by_shoulder_angle * angular_derivatives.y_by_elbow_angle 
      - angular_derivatives.x_by_elbow_angle * angular_derivatives.y_by_shoulder_angle;
 }
 
-void RobotWithHorizontalHand::_moveByWithExactMethod(double delta_x, double delta_y) {
+void Robot::_moveByWithExactMethod(double delta_x, double delta_y) {
   PlaneCartesianCoordinates current_cartesian_coordinates = currentCartesianCoordinates();
   PlaneCartesianCoordinates projected_cartesian_coordinates = {
     x: current_cartesian_coordinates.x + delta_x, 
@@ -97,7 +97,7 @@ void RobotWithHorizontalHand::_moveByWithExactMethod(double delta_x, double delt
 }
 
 
-void RobotWithHorizontalHand::_moveByWithDerivativeMethod(double delta_x, double delta_y) {
+void Robot::_moveByWithDerivativeMethod(double delta_x, double delta_y) {
   PlaneCartesianCoordinates current_cartesian_coordinates = currentCartesianCoordinates();
   PlaneCartesianCoordinates expected_cartesian_coordinates = {
     x: current_cartesian_coordinates.x + delta_x, y: current_cartesian_coordinates.y + delta_y};
@@ -114,7 +114,7 @@ void RobotWithHorizontalHand::_moveByWithDerivativeMethod(double delta_x, double
   double delta_shoulder_angle = (delta_x * angular_derivatives.y_by_elbow_angle - delta_y * angular_derivatives.x_by_elbow_angle) / determinant;
   double delta_elbow_angle = (delta_y * angular_derivatives.x_by_shoulder_angle - delta_x * angular_derivatives.y_by_shoulder_angle) / determinant;
   
-  RobotWithHorizontalHand::AngularCoordinates projected_angular_coordinates =  {
+  Robot::AngularCoordinates projected_angular_coordinates =  {
     shoulder_angle: _shoulder->currentAngle() + delta_shoulder_angle, 
     elbow_angle: _elbow->currentAngle() + delta_elbow_angle};
   PlaneCartesianCoordinates projected_cartesian_coordinates = _calculateCartesianCoordinates(projected_angular_coordinates);
@@ -135,26 +135,26 @@ void RobotWithHorizontalHand::_moveByWithDerivativeMethod(double delta_x, double
   return;
 }
 
-double RobotWithHorizontalHand::_calculateHandAngle(RobotWithHorizontalHand::AngularCoordinates angular_coordinates) {
+double Robot::_calculateHandAngle(Robot::AngularCoordinates angular_coordinates) {
   return angular_coordinates.shoulder_angle + angular_coordinates.elbow_angle - 90;
 }
 
-PlaneCartesianCoordinates RobotWithHorizontalHand::currentCartesianCoordinates(){
+PlaneCartesianCoordinates Robot::currentCartesianCoordinates(){
   return _calculateCartesianCoordinates(
     {shoulder_angle: _shoulder->currentAngle(), elbow_angle: _elbow->currentAngle()});
 } 
 
-RobotWithHorizontalHand::AngularCoordinates RobotWithHorizontalHand::currentAngularCoordinates(){
+Robot::AngularCoordinates Robot::currentAngularCoordinates(){
   return {shoulder_angle: _shoulder->currentAngle(), elbow_angle: _elbow->currentAngle()};
 }      
 
-void RobotWithHorizontalHand::moveArmsTo(double shoulder_angle, double elbow_angle){
+void Robot::moveArmsTo(double shoulder_angle, double elbow_angle){
   _shoulder->moveTo(shoulder_angle);
   _elbow->moveTo(elbow_angle);
   _hand->moveTo(_calculateHandAngle({shoulder_angle, elbow_angle}));
 }    
 
-void RobotWithHorizontalHand::moveBy(double delta_x, double delta_y) {
+void Robot::moveBy(double delta_x, double delta_y) {
   if (_method == MethodEnum::EXACT) {
    _moveByWithExactMethod(delta_x, delta_y);
   }
@@ -163,7 +163,7 @@ void RobotWithHorizontalHand::moveBy(double delta_x, double delta_y) {
   }
 }    
   
-void RobotWithHorizontalHand::setMethodToExact(){
+void Robot::setMethodToExact(){
    _method = MethodEnum::EXACT;
    _logging(
     LoggingEnum::INFO,
@@ -171,7 +171,7 @@ void RobotWithHorizontalHand::setMethodToExact(){
   );
 }
 
-void RobotWithHorizontalHand::setMethodToDerivative(){
+void Robot::setMethodToDerivative(){
   _method = MethodEnum::DERIVATIVE;
   _logging(
     LoggingEnum::INFO,
