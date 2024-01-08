@@ -1,7 +1,9 @@
 #ifndef ROBOTIC_ARM_SERVO_ARM_H
 #define ROBOTIC_ARM_SERVO_ARM_H
 
-#include "Servo.h"
+#include <Servo.h>
+#include <String.h>
+#include "logging.h"
 
 namespace robotic_arm {
 
@@ -11,7 +13,7 @@ class ServoArm {
   const double _length;
   const int _pin;
   const LoggingCallback _logging;
-  const Servo _servo;
+  Servo _servo;
   
   struct MapRange {
     double lower_bound;
@@ -39,6 +41,9 @@ class ServoArm {
     void moveBy(double delta);
 
     double currentAngle();
+
+    double length();
+}
 };
 
 } // namespace robotic_arm

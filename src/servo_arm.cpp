@@ -1,5 +1,7 @@
-#include "control.h"
+#include <Arduino.h>
+#include <String.h>
 #include "logging.h"
+#include "servo_arm.h"
 
 namespace robotic_arm {
 
@@ -38,7 +40,7 @@ void ServoArm::moveTo(double angle){
       "Servo arm " + String(_name) + ". Initial angle set to " + String(_current_angle) + ".");              
   }
   _is_current_angle_set = true;
-  int servo_angle = _nearestIntegerAngle(_transformArmAngleToServoAngle(_current_angle));
+  int servo_angle = ServoArm::_nearestIntegerAngle(ServoArm::_transformArmAngleToServoAngle(_current_angle));
   _logging(
     LoggingEnum::INFO,
     "Moving arm " + _name + " to position " + String(_current_angle) + " degrees via servo write " + String(servo_angle) + " degrees."
