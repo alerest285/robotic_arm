@@ -1,4 +1,7 @@
+#include <Arduino.h>
+#include <String.h>
 #include "logging.h"
+#include "math.h"
 #include "robot.h"
 
 namespace robotic_arm {
@@ -29,7 +32,8 @@ PlaneCartesianCoordinates RobotWithHorizontalHand::_calculateCartesianCoordinate
   return {x: x, y: y};
 }  
 
-AngularDerivatives RobotWithHorizontalHand::_calculateAngularDerivatives(AngularCoordinates angular_coordinates) {
+RobotWithHorizontalHand::AngularDerivatives RobotWithHorizontalHand::_calculateAngularDerivatives(
+  RobotWithHorizontalHand::AngularCoordinates angular_coordinates) {
   double A = _shoulder->length();
   double B = _elbow->length();
   double C = _forearm_length;
@@ -52,7 +56,8 @@ AngularDerivatives RobotWithHorizontalHand::_calculateAngularDerivatives(Angular
   };
 }
 
-AngularCoordinates RobotWithHorizontalHand::_calculateAngularCoordinates(PlaneCartesianCoordinates cartesian_coordinates) {
+RobotWithHorizontalHand::AngularCoordinates RobotWithHorizontalHand::_calculateAngularCoordinates(
+  PlaneCartesianCoordinates cartesian_coordinates) {
   double x = cartesian_coordinates.x;
   double y = cartesian_coordinates.y;
   double A = _shoulder->length();
@@ -109,7 +114,7 @@ void RobotWithHorizontalHand::_moveByWithDerivativeMethod(double delta_x, double
   double delta_shoulder_angle = (delta_x * angular_derivatives.y_by_elbow_angle - delta_y * angular_derivatives.x_by_elbow_angle) / determinant;
   double delta_elbow_angle = (delta_y * angular_derivatives.x_by_shoulder_angle - delta_x * angular_derivatives.y_by_shoulder_angle) / determinant;
   
-  AngularCoordinates projected_angular_coordinates =  {
+  RobotWithHorizontalHand::AngularCoordinates projected_angular_coordinates =  {
     shoulder_angle: _shoulder->currentAngle() + delta_shoulder_angle, 
     elbow_angle: _elbow->currentAngle() + delta_elbow_angle};
   PlaneCartesianCoordinates projected_cartesian_coordinates = _calculateCartesianCoordinates(projected_angular_coordinates);
@@ -130,7 +135,7 @@ void RobotWithHorizontalHand::_moveByWithDerivativeMethod(double delta_x, double
   return;
 }
 
-double RobotWithHorizontalHand::_calculateHandAngle(AngularCoordinates angular_coordinates) {
+double RobotWithHorizontalHand::_calculateHandAngle(RobotWithHorizontalHand::AngularCoordinates angular_coordinates) {
   return angular_coordinates.shoulder_angle + angular_coordinates.elbow_angle - 90;
 }
 
@@ -139,7 +144,7 @@ PlaneCartesianCoordinates RobotWithHorizontalHand::currentCartesianCoordinates()
     {shoulder_angle: _shoulder->currentAngle(), elbow_angle: _elbow->currentAngle()});
 } 
 
-AngularCoordinates RobotWithHorizontalHand::currentAngularCoordinates(){
+RobotWithHorizontalHand::AngularCoordinates RobotWithHorizontalHand::currentAngularCoordinates(){
   return {shoulder_angle: _shoulder->currentAngle(), elbow_angle: _elbow->currentAngle()};
 }      
 

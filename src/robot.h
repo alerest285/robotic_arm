@@ -1,8 +1,10 @@
 #ifndef ROBOTIC_ARM_ROBOT_H
 #define ROBOTIC_ARM_ROBOT_H
 
+#include <String.h>
 #include "logging.h"
 #include "math.h"
+#include "servo_arm.h"
 
 namespace robotic_arm {
 
@@ -10,9 +12,9 @@ class RobotWithHorizontalHand {
 
   LoggingCallback _logging;
 
-  const ServoArm *_shoulder;
-  const ServoArm *_elbow;
-  const ServoArm *_hand;
+  ServoArm *_shoulder;
+  ServoArm *_elbow;
+  ServoArm *_hand;
 
   double _forearm_length;
 
