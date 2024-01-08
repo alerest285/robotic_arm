@@ -107,8 +107,6 @@ void Robot::_moveByWithExactMethod(
   _shoulder->moveTo(projected_angular_coordinates.shoulder_angle);
   _elbow->moveTo(projected_angular_coordinates.elbow_angle);
   _hand->moveTo(_calculateHandAngle(projected_angular_coordinates));
-  // Necessary in case then hand arm reaches its limit:
-  _updateHandReferenceAngle();
 }
 
 void Robot::_moveByWithDerivativeMethod(
@@ -192,7 +190,6 @@ void Robot::moveArmsTo(AngularCoordinates angular_coordinates){
   _shoulder->moveTo(angular_coordinates.shoulder_angle);
   _elbow->moveTo(angular_coordinates.elbow_angle);
   _hand->moveTo(_calculateHandAngle(angular_coordinates));
-  _updateHandReferenceAngle();
 }    
 
 void Robot::moveBy(
