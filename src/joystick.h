@@ -32,3 +32,7 @@ class CartesianJoystick {
     
     PlaneCartesianCoordinates getDeltaCartesianCoordinates();
 };
+
+} // namespace robotic_arm
+
+#endif // ROBOTIC_ARM_JOYSTICK_H
