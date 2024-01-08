@@ -64,7 +64,7 @@ class Robot {
     
     void moveArmsTo(double shoulder_angle, double elbow_angle);
     
-    void moveBy(double delta_x, double delta_y);
+    void moveBy(PlaneCartesianCoordinates delta_cartesian_coordinates);
     
     void setMethodToExact();
     

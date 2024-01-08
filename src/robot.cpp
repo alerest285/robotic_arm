@@ -154,12 +154,12 @@ void Robot::moveArmsTo(double shoulder_angle, double elbow_angle){
   _hand->moveTo(_calculateHandAngle({shoulder_angle, elbow_angle}));
 }    
 
-void Robot::moveBy(double delta_x, double delta_y) {
+void Robot::moveBy(PlaneCartesianCoordinates delta_cartesian_coordinates) {
   if (_method == MethodEnum::EXACT) {
-   _moveByWithExactMethod(delta_x, delta_y);
+   _moveByWithExactMethod(delta_cartesian_coordinates.x, delta_cartesian_coordinates.y);
   }
   else if (_method == MethodEnum::DERIVATIVE) {
-   _moveByWithDerivativeMethod(delta_x, delta_y);
+   _moveByWithDerivativeMethod(delta_cartesian_coordinates.x, delta_cartesian_coordinates.y);
   }
 }    
   
