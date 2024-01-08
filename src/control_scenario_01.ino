@@ -31,7 +31,7 @@ void loop() {
     case 0: 
       // INITIALIZATION
       robot.setMethodToDerivative();
-      robot.moveArmsTo(90, 180);
+      robot.moveArmsTo(90, 180, 0);
       logging(
         robotic_arm::LoggingEnum::INFO, 
         "Cartesian coordinates: " + robot.currentCartesianCoordinates().toString()

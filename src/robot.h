@@ -26,6 +26,7 @@ class Robot {
   struct AngularCoordinates {
     double shoulder_angle;
     double elbow_angle;
+    double hand_reference_angle;
     String toString();
   };
 
@@ -47,7 +48,7 @@ class Robot {
 
   AngularDerivatives _calculateAngularDerivatives(AngularCoordinates angular_coordinates);
 
-  AngularCoordinates _calculateAngularCoordinates(PlaneCartesianCoordinates cartesian_coordinates);
+  AngularCoordinates _calculateAngularCoordinates(PlaneCartesianCoordinates cartesian_coordinates, double hand_reference_angle);
 
   double _calculateDeterminant(AngularDerivatives angular_derivatives);
 
@@ -57,6 +58,8 @@ class Robot {
 
   double _calculateHandAngle(AngularCoordinates angular_coordinates);
 
+  void _updateHandReferenceAngle();
+
   public:
 
     Robot(LoggingCallback logging_callback);
@@ -65,7 +68,7 @@ class Robot {
     
     AngularCoordinates currentAngularCoordinates();
     
-    void moveArmsTo(double shoulder_angle, double elbow_angle);
+    void moveArmsTo(double shoulder_angle, double elbow_angle, double hand_reference_angle);
     
     void moveBy(PlaneCartesianCoordinates delta_cartesian_coordinates);
     

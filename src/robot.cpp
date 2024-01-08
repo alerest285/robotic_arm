@@ -14,7 +14,9 @@ Robot::Robot(LoggingCallback logging_callback): _logging(logging_callback), _met
 };
 
 String Robot::AngularCoordinates::toString(){
-  return "shoulder_angle: " + String(shoulder_angle) + ", elbow_angle: " + String(elbow_angle);
+  return "shoulder_angle: " + String(shoulder_angle) 
+    + ", elbow_angle: " + String(elbow_angle)
+    + ", hand_reference_angle: " + String(hand_reference_angle);
 }  
   
 PlaneCartesianCoordinates Robot::_calculateCartesianCoordinates(AngularCoordinates angular_coordinates) {
@@ -25,10 +27,11 @@ PlaneCartesianCoordinates Robot::_calculateCartesianCoordinates(AngularCoordinat
   double x = A * cosDegrees(angular_coordinates.shoulder_angle) 
     - B * cosDegrees(angular_coordinates.elbow_angle + angular_coordinates.shoulder_angle)
     - C * sinDegrees(angular_coordinates.elbow_angle + angular_coordinates.shoulder_angle)
-    + D;
+    + D * cosDegrees(angular_coordinates.hand_reference_angle);
   double y = A * sinDegrees(angular_coordinates.shoulder_angle) 
     - B * sinDegrees(angular_coordinates.elbow_angle + angular_coordinates.shoulder_angle)
-    + C * cosDegrees(angular_coordinates.elbow_angle + angular_coordinates.shoulder_angle);   
+    + C * cosDegrees(angular_coordinates.elbow_angle + angular_coordinates.shoulder_angle)
+    + D * sinDegrees(angular_coordinates.hand_reference_angle);   
   return {x: x, y: y};
 }  
 
@@ -57,18 +60,22 @@ Robot::AngularDerivatives Robot::_calculateAngularDerivatives(
 }
 
 Robot::AngularCoordinates Robot::_calculateAngularCoordinates(
-  PlaneCartesianCoordinates cartesian_coordinates) {
-  double x = cartesian_coordinates.x;
-  double y = cartesian_coordinates.y;
+  PlaneCartesianCoordinates cartesian_coordinates, double hand_reference_angle) {
   double A = _shoulder->length();
   double B = _elbow->length();
   double C = _forearm_length;
   double D = _hand->length();
-  double R = sqrt(pow((x - D), 2) + pow(y, 2));
+
+  // Coordinates of the end point of the forearm.
+  double x_prime = cartesian_coordinates.x - D * cosDegrees(hand_reference_angle); 
+  double y_prime = cartesian_coordinates.y - D * sinDegrees(hand_reference_angle);
+  
+  double R = sqrt(pow(x_prime, 2) + pow(y_prime, 2));
   double S = sqrt(pow(B, 2) + pow(C, 2));
-  double shoulder_angle = acosDegrees((x - D) / R) + acosDegrees((pow(A, 2) + pow(R, 2) - pow(S, 2)) / (2 * A * R));
+
+  double shoulder_angle = acosDegrees(x_prime / R) + acosDegrees((pow(A, 2) + pow(R, 2) - pow(S, 2)) / (2 * A * R));
   double elbow_angle = acosDegrees(B / S) + acosDegrees((pow(S, 2)+ pow(A, 2)- pow(R, 2)) / (2 * A * S));
-  return {shoulder_angle: shoulder_angle, elbow_angle: elbow_angle};
+  return {shoulder_angle: shoulder_angle, elbow_angle: elbow_angle, hand_reference_angle: hand_reference_angle};
 }
 
 double Robot::_calculateDeterminant(AngularDerivatives angular_derivatives){
@@ -82,7 +89,7 @@ void Robot::_moveByWithExactMethod(double delta_x, double delta_y) {
     x: current_cartesian_coordinates.x + delta_x, 
     y: current_cartesian_coordinates.y + delta_y};
   AngularCoordinates projected_angular_coordinates =  
-    _calculateAngularCoordinates(projected_cartesian_coordinates);
+    _calculateAngularCoordinates(projected_cartesian_coordinates, _hand_reference_angle);
   if (isnan(projected_angular_coordinates.shoulder_angle) 
     || isnan(projected_angular_coordinates.elbow_angle)) {
     _logging(
@@ -94,8 +101,9 @@ void Robot::_moveByWithExactMethod(double delta_x, double delta_y) {
   _shoulder->moveTo(projected_angular_coordinates.shoulder_angle);
   _elbow->moveTo(projected_angular_coordinates.elbow_angle);
   _hand->moveTo(_calculateHandAngle(projected_angular_coordinates));
+  // Necessary in case then hand arm reaches its limit:
+  _updateHandReferenceAngle();
 }
-
 
 void Robot::_moveByWithDerivativeMethod(double delta_x, double delta_y) {
   PlaneCartesianCoordinates current_cartesian_coordinates = currentCartesianCoordinates();
@@ -116,7 +124,8 @@ void Robot::_moveByWithDerivativeMethod(double delta_x, double delta_y) {
   
   Robot::AngularCoordinates projected_angular_coordinates =  {
     shoulder_angle: _shoulder->currentAngle() + delta_shoulder_angle, 
-    elbow_angle: _elbow->currentAngle() + delta_elbow_angle};
+    elbow_angle: _elbow->currentAngle() + delta_elbow_angle,
+    hand_reference_angle: _hand_reference_angle};
   PlaneCartesianCoordinates projected_cartesian_coordinates = _calculateCartesianCoordinates(projected_angular_coordinates);
   _logging(
     LoggingEnum::INFO,
@@ -132,11 +141,17 @@ void Robot::_moveByWithDerivativeMethod(double delta_x, double delta_y) {
   _shoulder->moveBy(delta_shoulder_angle);
   _elbow->moveBy(delta_elbow_angle);
   _hand->moveBy(delta_shoulder_angle + delta_elbow_angle);
+  _updateHandReferenceAngle();
   return;
 }
 
 double Robot::_calculateHandAngle(Robot::AngularCoordinates angular_coordinates) {
-  return angular_coordinates.shoulder_angle + angular_coordinates.elbow_angle - 90;
+  return angular_coordinates.shoulder_angle + angular_coordinates.elbow_angle 
+    - angular_coordinates.hand_reference_angle - 90;
+}
+
+void Robot::_updateHandReferenceAngle(){
+  _hand_reference_angle = _shoulder->currentAngle() + _elbow->currentAngle() - _hand->currentAngle() - 90;
 }
 
 PlaneCartesianCoordinates Robot::currentCartesianCoordinates(){
@@ -145,13 +160,17 @@ PlaneCartesianCoordinates Robot::currentCartesianCoordinates(){
 } 
 
 Robot::AngularCoordinates Robot::currentAngularCoordinates(){
-  return {shoulder_angle: _shoulder->currentAngle(), elbow_angle: _elbow->currentAngle()};
+  return {
+    shoulder_angle: _shoulder->currentAngle(), 
+    elbow_angle: _elbow->currentAngle(),
+    hand_reference_angle: _hand_reference_angle};
 }      
 
-void Robot::moveArmsTo(double shoulder_angle, double elbow_angle){
+void Robot::moveArmsTo(double shoulder_angle, double elbow_angle, double hand_reference_angle){
   _shoulder->moveTo(shoulder_angle);
   _elbow->moveTo(elbow_angle);
-  _hand->moveTo(_calculateHandAngle({shoulder_angle, elbow_angle}));
+  _hand->moveTo(_calculateHandAngle({shoulder_angle, elbow_angle, hand_reference_angle}));
+  _updateHandReferenceAngle();
 }    
 
 void Robot::moveBy(PlaneCartesianCoordinates delta_cartesian_coordinates) {
