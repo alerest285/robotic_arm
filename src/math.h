@@ -1,6 +1,8 @@
 #ifndef ROBOTIC_ARM_MATH_H
 #define ROBOTIC_ARM_MATH_H
 
+#include <String.h>
+
 namespace robotic_arm {
 
 constexpr double pi = 3.1415926535897932384626433;

@@ -1,3 +1,5 @@
+#include <Arduino.h>
+#include <String.h>
 #include "math.h"
 
 namespace robotic_arm {
@@ -22,7 +24,7 @@ double acosDegrees(double x){
   return acos(x) * 180 / pi;
 }
 
-PlaneCartesianCoordinates::toString(){
+String PlaneCartesianCoordinates::toString(){
     return "x: " + String(x) + ", y: " + String(y);
 }
 
