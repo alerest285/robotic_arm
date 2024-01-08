@@ -24,4 +24,16 @@ PlaneCartesianCoordinates CartesianJoystick::getDeltaCartesianCoordinates(){
   return PlaneCartesianCoordinates({x: delta_x, y: delta_y});
 }
 
+AngularJoystick::AngularJoystick(int input_pin, double max_displacement_per_loop): 
+  _input_pin(input_pin), _max_displacement_per_loop(max_displacement_per_loop){
+
+  pinMode(_input_pin, INPUT);  
+}
+
+double AngularJoystick::getDeltaAngle(){
+  int input = analogRead(_input_pin);
+  int input_in_milis = map(input, MIN_JOYSTICK_INPUT, MAX_JOYSTICK_INPUT, 1000, -1000);
+  return (abs(input_in_milis) >= _min_milis) ? _max_displacement_per_loop * input_in_milis / 1000.0 : 0;
+}
+
 } // namespace robotic_arm

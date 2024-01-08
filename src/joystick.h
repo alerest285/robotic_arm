@@ -33,6 +33,24 @@ class CartesianJoystick {
     PlaneCartesianCoordinates getDeltaCartesianCoordinates();
 };
 
+class AngularJoystick {
+
+  int _input_pin;
+  double _max_displacement_per_loop;
+
+  const int _min_milis = 100;
+
+  public: 
+
+    /**
+     * @param input_pin Pin number for the angle input signal.
+     * @param max_displacement_per_loop Maximum displacement signaled (in degrees).
+     */
+    AngularJoystick(int input_pin, double max_displacement_per_loop);
+    
+    double getDeltaAngle();
+};
+
 } // namespace robotic_arm
 
 #endif // ROBOTIC_ARM_JOYSTICK_H
