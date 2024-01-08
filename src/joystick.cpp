@@ -1,4 +1,4 @@
-#include <arduino.h>
+#include <Arduino.h>
 #include "joystick.h"
 #include "math.h"
 
