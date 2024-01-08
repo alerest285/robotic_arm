@@ -5,8 +5,6 @@
 
 namespace robotic_arm {
 
-constexpr double pi = 3.1415926535897932384626433;
-
 double cosDegrees(double x);
 
 double cosDegreesDerivative(double x);
