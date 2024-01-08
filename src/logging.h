@@ -1,6 +1,8 @@
 #ifndef ROBOTIC_ARM_LOGGING_H
 #define ROBOTIC_ARM_LOGGING_H
 
+#include <String.h>
+
 namespace robotic_arm {
 
 enum class LoggingEnum {FATAL, ERROR, WARN, INFO, DEBUG};
