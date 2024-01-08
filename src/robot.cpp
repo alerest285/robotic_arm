@@ -171,10 +171,10 @@ Robot::AngularCoordinates Robot::currentAngularCoordinates(){
     hand_reference_angle: _hand_reference_angle};
 }      
 
-void Robot::moveArmsTo(double shoulder_angle, double elbow_angle, double hand_reference_angle){
-  _shoulder->moveTo(shoulder_angle);
-  _elbow->moveTo(elbow_angle);
-  _hand->moveTo(_calculateHandAngle({shoulder_angle, elbow_angle, hand_reference_angle}));
+void Robot::moveArmsTo(AngularCoordinates angular_coordinates){
+  _shoulder->moveTo(angular_coordinates.shoulder_angle);
+  _elbow->moveTo(angular_coordinates.elbow_angle);
+  _hand->moveTo(_calculateHandAngle(angular_coordinates));
   _updateHandReferenceAngle();
 }    
 

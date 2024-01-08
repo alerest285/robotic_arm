@@ -68,7 +68,7 @@ class Robot {
     
     AngularCoordinates currentAngularCoordinates();
     
-    void moveArmsTo(double shoulder_angle, double elbow_angle, double hand_reference_angle);
+    void moveArmsTo(AngularCoordinates angular_coordinates);
     
     void moveBy(PlaneCartesianCoordinates delta_cartesian_coordinates);
     
