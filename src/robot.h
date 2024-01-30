@@ -63,7 +63,7 @@ class Robot {
 
   public:
 
-    Robot(LoggingCallback logging_callback);
+    Robot(ServoArm* shoulder_arm, ServoArm* elbow_arm, ServoArm* hand_arm, LoggingCallback logging_callback);
     
     PlaneCartesianCoordinates currentCartesianCoordinates();
     

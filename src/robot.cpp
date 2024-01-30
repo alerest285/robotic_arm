@@ -6,12 +6,9 @@
 
 namespace robotic_arm {
 
-Robot::Robot(LoggingCallback logging_callback): _logging(logging_callback), _method(MethodEnum::EXACT), 
-  _forearm_length(15.0){
-  _shoulder = new ServoArm("shoulder", /*length=*/ 18.7, /*pin=*/9, /*map_range=*/{0, 180, 141, 5}, _logging);
-  _elbow = new ServoArm("elbow", /*length=*/ 6.7, /*pin=*/10, /*map_range=*/{90, 270, 0, 180}, _logging);      
-  _hand = new ServoArm("hand", /*length=*/ 6.0, /*pin=*/11, /*map_range=*/{90, 270, 10, 170}, _logging);
-};
+Robot::Robot(ServoArm* shoulder_arm, ServoArm* elbow_arm, ServoArm* hand_arm, LoggingCallback logging_callback): 
+  _shoulder(shoulder_arm), _elbow(elbow_arm), _hand(hand_arm),
+  _logging(logging_callback), _method(MethodEnum::EXACT), _forearm_length(15.0){};
 
 String Robot::AngularCoordinates::toString(){
   return "shoulder_angle: " + String(shoulder_angle) 
@@ -101,13 +98,12 @@ void Robot::_moveByWithExactMethod(
     || isnan(projected_angular_coordinates.elbow_angle)) {
     _logging(
     LoggingEnum::WARN,
-      "Moving the robot to the impossible position " 
-        + projected_cartesian_coordinates.toString());
+      "Trying to move the robot to the impossible position " 
+        + projected_cartesian_coordinates.toString() 
+        + "with a hand reference angle " + String(projected_hand_reference_angle));
     return;
   }
-  _shoulder->moveTo(projected_angular_coordinates.shoulder_angle);
-  _elbow->moveTo(projected_angular_coordinates.elbow_angle);
-  _hand->moveTo(_calculateHandAngle(projected_angular_coordinates));
+  moveArmsTo(projected_angular_coordinates);
 }
 
 void Robot::_moveByWithDerivativeMethod(
@@ -164,10 +160,14 @@ void Robot::_moveByWithDerivativeMethod(
         "Trying to move to an unstable position " + projected_cartesian_coordinates.toString());      
     return;
   }
-  _shoulder->moveBy(delta_shoulder_angle);
-  _elbow->moveBy(delta_elbow_angle);
-  _hand->moveBy(delta_shoulder_angle + delta_elbow_angle - delta_hand_reference_angle);
-  return;
+  double delta_hand_angle = delta_shoulder_angle + delta_elbow_angle - delta_hand_reference_angle;
+  if (_shoulder->canMoveBy(delta_shoulder_angle) 
+    && _elbow->canMoveBy(delta_elbow_angle) 
+    && _hand->canMoveBy(delta_hand_angle)) {
+    _shoulder->moveBy(delta_shoulder_angle);
+    _elbow->moveBy(delta_elbow_angle);
+    _hand->moveBy(delta_hand_angle);
+  }
 }
 
 double Robot::_calculateHandAngle(Robot::AngularCoordinates angular_coordinates) {
@@ -180,8 +180,7 @@ double Robot::_getCurrentHandReferenceAngle(){
 }
 
 PlaneCartesianCoordinates Robot::currentCartesianCoordinates(){
-  return _calculateCartesianCoordinates(
-    {shoulder_angle: _shoulder->currentAngle(), elbow_angle: _elbow->currentAngle()});
+  return _calculateCartesianCoordinates(currentAngularCoordinates());
 } 
 
 Robot::AngularCoordinates Robot::currentAngularCoordinates(){
@@ -192,9 +191,14 @@ Robot::AngularCoordinates Robot::currentAngularCoordinates(){
 }      
 
 void Robot::moveArmsTo(AngularCoordinates angular_coordinates){
-  _shoulder->moveTo(angular_coordinates.shoulder_angle);
-  _elbow->moveTo(angular_coordinates.elbow_angle);
-  _hand->moveTo(_calculateHandAngle(angular_coordinates));
+  double hand_angle = _calculateHandAngle(angular_coordinates);
+  if(_shoulder->canMoveTo(angular_coordinates.shoulder_angle) 
+    && _elbow->canMoveTo(angular_coordinates.elbow_angle) 
+    && _hand->canMoveTo(hand_angle)){
+    _shoulder->moveTo(angular_coordinates.shoulder_angle);
+    _elbow->moveTo(angular_coordinates.elbow_angle);
+    _hand->moveTo(hand_angle);
+  }  
 }    
 
 void Robot::moveBy(PlaneCartesianCoordinates delta_cartesian_coordinates) {
@@ -214,8 +218,6 @@ void Robot::rotateHandBy(double delta_hand_reference_angle) {
    _moveByWithExactMethod(/*delta_cartesian_coordinates=*/{x: 0, y: 0}, delta_hand_reference_angle);
   }
 }
-
-
   
 void Robot::setMethodToExact(){
    _method = MethodEnum::EXACT;
@@ -232,6 +234,5 @@ void Robot::setMethodToDerivative(){
     "Method set to DERIVATIVE"
   );
 }
-
 
 } // namespace robotic_arm
