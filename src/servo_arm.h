@@ -11,15 +11,16 @@ class ServoArm {
 
   const String _name; 
   const double _length;
-  const int _pin;
   const LoggingCallback _logging;
-  Servo _servo;
+  Servo* _servo;  
   
   struct MapRange {
-    double lower_bound;
-    double upper_bound;
-    double servo_to_lower_bound;
-    double servo_to_upper_bound;
+    double minimum_allowed_angle;
+    double maximum_allowed_angle;
+    double first_callibration_angle;
+    double second_callibration_angle;
+    double servo_to_first_callibration_angle;
+    double servo_to_second_callibration_angle;
   };
   const MapRange _map_range;
     
@@ -34,13 +35,27 @@ class ServoArm {
 
   public:
 
-    ServoArm(String name, double length, int pin, MapRange map_range, LoggingCallback logging_callback);
+    ServoArm(String name, Servo* servo, double length, MapRange map_range, LoggingCallback logging_callback);
 
     void moveTo(double angle);
 
-    void moveBy(double delta);
+    void moveBy(double delta_angle);
+
+    bool canMoveTo(double angle);
+
+    bool canMoveBy(double delta_angle);
+
+    bool isAngleAllowed(double angle);
 
     double currentAngle();
+
+    double minAngle() {return _map_range.minimum_allowed_angle;}
+
+    double maxAngle() {return _map_range.maximum_allowed_angle;}
+
+    double firstCallibrationAngle() {return _map_range.first_callibration_angle;}
+    
+    double secondCallibrationAngle() {return _map_range.second_callibration_angle;}
 
     double length();
     
