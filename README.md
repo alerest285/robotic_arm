@@ -56,4 +56,9 @@ double currentAngle();
 ```
 
 
+## Read the paper
+
+https://docs.google.com/document/d/1RDTosWxl55HQCBOGslz9zHXbvPj9Iu7pmoaEarzymBw/edit?usp=sharing
+
+
 
