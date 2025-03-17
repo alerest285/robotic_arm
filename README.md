@@ -1,5 +1,3 @@
-> Abstract 
-This paper exhibits the design and construction of a six-degrees-of-freedom robot arm using consumer electronics and affordable materials in order to emulate the positioning capabilities of an industrial robot arm. To achieve this, an optimal mechanical prototype is modeled and built, using servo motors as the main actuators. Furthermore, two mathematical control methods are proposed: a trigonometric exact inversion and an approximate local inversion via derivatives. These methods are implemented into an open source C++ library. The implementation successfully performed an inverse kinematic analysis, allowing for two-dimensional trajectory control and pivoting of the end-effector using input devices. A series of user interface and stability tests were conducted with positive results in precision and repeatability in most scenarios. 
 
 
 ## Microcontroller-Driven Robotic Arm with Software Integration
@@ -9,6 +7,10 @@ This paper exhibits the design and construction of a six-degrees-of-freedom robo
 ## This Github repository is part of the C++ implementation from my Matura Thesis in Computer Science. 
 > Microcontroller-Driven Robotic Arm with Software Integration 
 >> Supervisor: Professor Christoph Vogel
+
+
+### Abstract 
+This paper exhibits the design and construction of a six-degrees-of-freedom robot arm using consumer electronics and affordable materials in order to emulate the positioning capabilities of an industrial robot arm. To achieve this, an optimal mechanical prototype is modeled and built, using servo motors as the main actuators. Furthermore, two mathematical control methods are proposed: a trigonometric exact inversion and an approximate local inversion via derivatives. These methods are implemented into an open source C++ library. The implementation successfully performed an inverse kinematic analysis, allowing for two-dimensional trajectory control and pivoting of the end-effector using input devices. A series of user interface and stability tests were conducted with positive results in precision and repeatability in most scenarios. 
 
 
 ## 4.6.1 Software Architecture 
